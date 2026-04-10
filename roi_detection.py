@@ -7,7 +7,7 @@ def preprocess(img):
     gray = cv2.bilateralFilter(gray, 11, 17, 17)
     blurred = cv2.GaussianBlur(gray, (5, 5), 0)
 
-    edged = cv2.Canny(blurred, 30, 150)
+    edged = cv2.Canny(blurred, 10, 100)
     edged = cv2.morphologyEx(
         edged,
         cv2.MORPH_CLOSE,
@@ -62,23 +62,3 @@ def crop_from_original(original, resized, candidates, pad=5):
         rois.append((x0, y0, x1, y1, roi))
 
     return rois
-
-if __name__ == "__main__":
-    img = cv2.imread("./img/raw/raw_015.jpg")
-
-    resized, gray, edged = preprocess(img)
-    displays = find_big_displays(edged)
-    rois = crop_from_original(img, resized, displays, pad=5)
-
-    vis = resized.copy()
-
-    for i, (x, y, w, h, area) in enumerate(displays):
-        cv2.rectangle(vis, (x, y), (x + w, y + h), (0, 255, 0), 2)
-
-    for i, (x0, y0, x1, y1, roi) in enumerate(rois):
-        cv2.imshow(f"roi_{i}", roi)
-
-    #cv2.imshow("edged", edged)
-    cv2.imshow("detected", vis)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
